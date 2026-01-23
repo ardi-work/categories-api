@@ -1,7 +1,3 @@
-Berikut **contoh `README.md`** yang rapi, profesional, dan siap dipakai untuk project **CRUD Kategori API (Golang, Modular, Pagination)**.
-
----
-
 ```md
 # Category API (Golang)
 
