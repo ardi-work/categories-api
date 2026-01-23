@@ -1,4 +1,3 @@
-```md
 # Category API (Golang)
 
 RESTful API sederhana menggunakan **Golang (net/http)** dengan konsep **modular**, menyediakan **CRUD Kategori** dan **pagination**.  
@@ -24,7 +23,6 @@ Project ini cocok sebagai:
 
 ## 🧱 Struktur Project
 
-```
 
 category-api/
 ├── main.go
@@ -37,8 +35,6 @@ category-api/
 │   └── category_handler.go
 ├── utils/
 │   └── pagination.go
-
-```
 
 ---
 
