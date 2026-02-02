@@ -1,11 +1,11 @@
 # Category API (Golang)
 
 RESTful API sederhana menggunakan **Golang (net/http)** dengan konsep **modular**, menyediakan **CRUD Kategori** dan **pagination**.  
-Data disimpan secara **in-memory** dengan **40 dummy data awal**.
+Data disimpan di **PostgreSQL database**.
 
 Project ini cocok sebagai:
-- latihan REST API Golang
-- boilerplate CRUD sederhana
+- latihan REST API Golang dengan database
+- boilerplate CRUD dengan PostgreSQL
 - referensi struktur modular Go API
 
 ---
@@ -16,25 +16,29 @@ Project ini cocok sebagai:
 - Pagination menggunakan query parameter
 - Default pagination: **10 data per halaman**
 - Struktur project modular
-- Tanpa database (in-memory storage)
+- PostgreSQL database integration
 - Menggunakan standard library Go
+- Environment variable configuration
+- Automatic timestamp (created_at, updated_at)
 
 ---
 
 ## 🧱 Struktur Project
 
-
 category-api/
 ├── main.go
 ├── go.mod
+├── .env                  # Environment variables
+├── database/
+│   └── database.go       # PostgreSQL connection
 ├── models/
-│   └── category.go
+│   └── categories.go     # Data models
 ├── repositories/
-│   └── category_repository.go
+│   └── category_repository.go # Database operations
 ├── handlers/
-│   └── category_handler.go
+│   └── category_handler.go    # HTTP handlers
 ├── utils/
-│   └── pagination.go
+│   └── pagination.go     # Pagination utility
 
 ---
 
@@ -42,11 +46,13 @@ category-api/
 
 ### Category
 
-| Field       | Type   |
-|------------|--------|
-| id         | int    |
-| name       | string |
-| description| string |
+| Field       | Type     |
+|------------|----------|
+| id         | int      |
+| name       | string   |
+| description| string   |
+| created_at | time.Time|
+| updated_at | time.Time|
 
 ---
 
@@ -55,9 +61,7 @@ category-api/
 ### 1️⃣ Get All Categories (Pagination)
 
 ```
-
 GET /categories
-
 ```
 
 **Query Params (optional):**
@@ -66,10 +70,8 @@ GET /categories
 
 **Contoh:**
 ```
-
 GET /categories?page=2&limit=5
-
-````
+```
 
 **Response:**
 ```json
@@ -80,11 +82,13 @@ GET /categories?page=2&limit=5
     {
       "id": 6,
       "name": "Category F",
-      "description": "Description for category"
+      "description": "Description for category",
+      "created_at": "2026-02-02T10:00:00Z",
+      "updated_at": "2026-02-02T10:00:00Z"
     }
   ]
 }
-````
+```
 
 ---
 
@@ -95,9 +99,19 @@ GET /categories/{id}
 ```
 
 **Contoh:**
-
 ```
 GET /categories/1
+```
+
+**Response:**
+```json
+{
+  "id": 1,
+  "name": "Category A",
+  "description": "Description for category",
+  "created_at": "2026-02-02T10:00:00Z",
+  "updated_at": "2026-02-02T10:00:00Z"
+}
 ```
 
 ---
@@ -123,7 +137,9 @@ POST /categories
 {
   "id": 41,
   "name": "New Category",
-  "description": "New Description"
+  "description": "New Description",
+  "created_at": "2026-02-02T11:00:00Z",
+  "updated_at": "2026-02-02T11:00:00Z"
 }
 ```
 
@@ -144,6 +160,17 @@ PUT /categories/{id}
 }
 ```
 
+**Response:**
+```json
+{
+  "id": 1,
+  "name": "Updated Category",
+  "description": "Updated Description",
+  "created_at": "2026-02-02T10:00:00Z",
+  "updated_at": "2026-02-02T12:00:00Z"
+}
+```
+
 ---
 
 ### 5️⃣ Delete Category
@@ -153,17 +180,45 @@ DELETE /categories/{id}
 ```
 
 **Response:**
-
 ```
 204 No Content
 ```
 
 ---
 
-## 🧪 Dummy Data
+## 🗄 Database Setup
 
-* Saat aplikasi dijalankan, otomatis dibuat **40 data kategori dummy**
-* Data bersifat **in-memory**, akan reset setiap restart server
+### Prerequisites
+
+- PostgreSQL installed and running
+- Create a database for the project
+
+### Create Table
+
+Run this SQL command to create the categories table:
+
+```sql
+CREATE TABLE categories (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+---
+
+## 🔧 Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+PORT=8080
+DB_CONN=postgres://username:password@localhost:5432/database_name?sslmode=disable
+```
+
+**Note:** Replace `username`, `password`, and `database_name` with your actual PostgreSQL credentials.
 
 ---
 
@@ -172,17 +227,28 @@ DELETE /categories/{id}
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/username/category-api.git
-cd category-api
+git clone https://github.com/username/categories-api.git
+cd categories-api
 ```
 
-### 2. Init Module (jika belum)
+### 2. Install Dependencies
 
 ```bash
-go mod init category-api
+go mod download
 ```
 
-### 3. Jalankan Server
+### 3. Setup Environment
+
+```bash
+cp .env.example .env
+# Edit .env with your database credentials
+```
+
+### 4. Create Database Table
+
+Run the SQL command from the "Database Setup" section above.
+
+### 5. Jalankan Server
 
 ```bash
 go run main.go
@@ -200,6 +266,9 @@ http://localhost:8080
 
 * Go (Golang)
 * net/http (standard library)
+* PostgreSQL
+* github.com/lib/pq (PostgreSQL driver)
+* github.com/spf13/viper (Configuration management)
 * JSON API
 
 ---
@@ -208,24 +277,26 @@ http://localhost:8080
 
 Project ini **belum menggunakan**:
 
-* Database (MySQL, PostgreSQL, MongoDB)
 * Framework (Gin, Echo, Fiber)
 * Authentication / Authorization
+* ORM (GORM, sqlx)
 
 ---
 
 ## 🚧 Pengembangan Lanjutan (Opsional)
 
-* Integrasi database
 * Pagination metadata (`total`, `last_page`)
 * Validation request body
-* Middleware (logging, recovery)
+* Middleware (logging, recovery, CORS)
 * Clean Architecture / Hexagonal
 * Docker support
+* Unit testing & integration testing
+* API Documentation (Swagger/OpenAPI)
+* Authentication with JWT
+* Rate limiting
 
 ---
 
 ## 📄 Lisensi
 
 MIT License
-
