@@ -1,0 +1,1 @@
+{"id":"categoies-api-cgd","title":"Fix SQL scan error for NULL updated_at column","status":"in_progress","priority":2,"issue_type":"bug","owner":"ansyah85.ardi@gmail.com","created_at":"2026-02-02T18:02:03.4828422+07:00","created_by":"Ardiansyah","updated_at":"2026-02-02T18:02:08.9432433+07:00"}

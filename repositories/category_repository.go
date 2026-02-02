@@ -40,7 +40,7 @@ func GetByID(id int) (*models.Category, error) {
 
 func Create(category models.Category) (*models.Category, error) {
 	db := database.GetDB()
-	err := db.QueryRow("INSERT INTO categories (name, description) VALUES ($1, $2) RETURNING id, name, description, created_at, updated_at", category.Name, category.Description).Scan(&category.ID, &category.Name, &category.Description, &category.CreatedAt, &category.UpdatedAt)
+	err := db.QueryRow("INSERT INTO categories (name, description, updated_at) VALUES ($1, $2, CURRENT_TIMESTAMP) RETURNING id, name, description, created_at, updated_at", category.Name, category.Description).Scan(&category.ID, &category.Name, &category.Description, &category.CreatedAt, &category.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
