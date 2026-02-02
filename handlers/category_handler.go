@@ -38,7 +38,12 @@ func CategoriesHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		var category models.Category
 		json.NewDecoder(r.Body).Decode(&category)
-		created := repositories.Create(category)
+		created, err := repositories.Create(category)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+			return
+		}
 		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(created)
 
