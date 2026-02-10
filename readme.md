@@ -13,7 +13,10 @@ Project ini cocok sebagai:
 ## 🚀 Fitur
 
 - CRUD Kategori (Create, Read, Update, Delete)
+- CRUD Produk (Create, Read, Update, Delete)
+- Produk dengan relasi ke Kategori (foreign key)
 - Pagination menggunakan query parameter
+- Filter produk berdasarkan category_id
 - Default pagination: **10 data per halaman**
 - Struktur project modular
 - PostgreSQL database integration
@@ -32,11 +35,14 @@ category-api/
 ├── database/
 │   └── database.go       # PostgreSQL connection
 ├── models/
-│   └── categories.go     # Data models
+│   ├── categories.go     # Category data model
+│   └── products.go       # Product data model
 ├── repositories/
-│   └── category_repository.go # Database operations
+│   ├── category_repository.go # Category database operations
+│   └── product_repository.go   # Product database operations
 ├── handlers/
-│   └── category_handler.go    # HTTP handlers
+│   ├── category_handler.go    # Category HTTP handlers
+│   └── product_handler.go     # Product HTTP handlers
 ├── utils/
 │   └── pagination.go     # Pagination utility
 
@@ -53,6 +59,16 @@ category-api/
 | description| string   |
 | created_at | time.Time|
 | updated_at | time.Time|
+
+### Product
+
+| Field        | Type  |
+|-------------|-------|
+| id          | int   |
+| name        | string|
+| price       | int   |
+| stock       | int   |
+| categories_id| int   |
 
 ---
 
@@ -186,6 +202,143 @@ DELETE /categories/{id}
 
 ---
 
+## 📦 Product Endpoints
+
+### 6️⃣ Get All Products (Pagination)
+
+```
+GET /products
+```
+
+**Query Params (optional):**
+- `page` → default `1`
+- `limit` → default `10`
+- `category_id` → filter by category
+
+**Contoh:**
+```
+GET /products?page=2&limit=5
+GET /products?category_id=1
+```
+
+**Response:**
+```json
+{
+  "page": 2,
+  "limit": 5,
+  "data": [
+    {
+      "id": 6,
+      "name": "Product F",
+      "price": 100000,
+      "stock": 50,
+      "categories_id": 1
+    }
+  ]
+}
+```
+
+---
+
+### 7️⃣ Get Product By ID
+
+```
+GET /products/{id}
+```
+
+**Contoh:**
+```
+GET /products/1
+```
+
+**Response:**
+```json
+{
+  "id": 1,
+  "name": "Product A",
+  "price": 50000,
+  "stock": 100,
+  "categories_id": 1
+}
+```
+
+---
+
+### 8️⃣ Create Product
+
+```
+POST /products
+```
+
+**Request Body:**
+
+```json
+{
+  "name": "New Product",
+  "price": 75000,
+  "stock": 20,
+  "categories_id": 1
+}
+```
+
+**Response:**
+
+```json
+{
+  "id": 1,
+  "name": "New Product",
+  "price": 75000,
+  "stock": 20,
+  "categories_id": 1
+}
+```
+
+---
+
+### 9️⃣ Update Product
+
+```
+PUT /products/{id}
+```
+
+**Request Body:**
+
+```json
+{
+  "name": "Updated Product",
+  "price": 80000,
+  "stock": 15,
+  "categories_id": 2
+}
+```
+
+**Response:**
+
+```json
+{
+  "id": 1,
+  "name": "Updated Product",
+  "price": 80000,
+  "stock": 15,
+  "categories_id": 2
+}
+```
+
+---
+
+### 🔟 Delete Product
+
+```
+DELETE /products/{id}
+```
+
+**Response:**
+```
+204 No Content
+```
+
+---
+
 ## 🗄 Database Setup
 
 ### Prerequisites
@@ -193,9 +346,9 @@ DELETE /categories/{id}
 - PostgreSQL installed and running
 - Create a database for the project
 
-### Create Table
+### Create Tables
 
-Run this SQL command to create the categories table:
+Run these SQL commands to create the categories and products tables:
 
 ```sql
 CREATE TABLE categories (
@@ -204,6 +357,15 @@ CREATE TABLE categories (
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE products (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    price INT NOT NULL,
+    stock INT NOT NULL,
+    categories_id INT NOT NULL,
+    FOREIGN KEY (categories_id) REFERENCES categories(id) ON DELETE CASCADE
 );
 ```
 
