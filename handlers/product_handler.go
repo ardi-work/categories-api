@@ -16,6 +16,7 @@ func ProductsHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
+		name := r.URL.Query().Get("name")
 		categoryID, _ := strconv.Atoi(r.URL.Query().Get("category_id"))
 		page, _ := strconv.Atoi(r.URL.Query().Get("page"))
 		limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
@@ -28,7 +29,9 @@ func ProductsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		var data []models.Product
-		if categoryID > 0 {
+		if name != "" {
+			data = repositories.GetProductsByName(name)
+		} else if categoryID > 0 {
 			data = repositories.GetProductsByCategoryID(categoryID)
 		} else {
 			data = repositories.GetAllProducts()

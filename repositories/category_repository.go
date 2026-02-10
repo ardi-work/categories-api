@@ -28,6 +28,26 @@ func GetAll() []models.Category {
 	return categories
 }
 
+func GetByName(name string) []models.Category {
+	db := database.GetDB()
+	rows, err := db.Query("SELECT id, name, description, created_at, updated_at FROM categories WHERE name ILIKE $1 ORDER BY id", "%"+name+"%")
+	if err != nil {
+		return nil
+	}
+	defer rows.Close()
+
+	var categories []models.Category
+	for rows.Next() {
+		var c models.Category
+		err := rows.Scan(&c.ID, &c.Name, &c.Description, &c.CreatedAt, &c.UpdatedAt)
+		if err != nil {
+			continue
+		}
+		categories = append(categories, c)
+	}
+	return categories
+}
+
 func GetByID(id int) (*models.Category, error) {
 	db := database.GetDB()
 	var c models.Category

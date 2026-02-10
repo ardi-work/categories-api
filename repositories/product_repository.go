@@ -25,6 +25,26 @@ func GetAllProducts() []models.Product {
 	return products
 }
 
+func GetProductsByName(name string) []models.Product {
+	db := database.GetDB()
+	rows, err := db.Query("SELECT id, name, price, stock, categories_id FROM products WHERE name ILIKE $1 ORDER BY id", "%"+name+"%")
+	if err != nil {
+		return nil
+	}
+	defer rows.Close()
+
+	var products []models.Product
+	for rows.Next() {
+		var p models.Product
+		err := rows.Scan(&p.ID, &p.Name, &p.Price, &p.Stock, &p.CategoriesID)
+		if err != nil {
+			continue
+		}
+		products = append(products, p)
+	}
+	return products
+}
+
 func GetProductByID(id int) (*models.Product, error) {
 	db := database.GetDB()
 	var p models.Product

@@ -83,10 +83,12 @@ GET /categories
 **Query Params (optional):**
 - `page` → default `1`
 - `limit` → default `10`
+- `name` → filter by name (case-insensitive search)
 
 **Contoh:**
 ```
 GET /categories?page=2&limit=5
+GET /categories?name=electronic
 ```
 
 **Response:**
@@ -214,11 +216,13 @@ GET /products
 - `page` → default `1`
 - `limit` → default `10`
 - `category_id` → filter by category
+- `name` → filter by name (case-insensitive search)
 
 **Contoh:**
 ```
 GET /products?page=2&limit=5
 GET /products?category_id=1
+GET /products?name=laptop
 ```
 
 **Response:**

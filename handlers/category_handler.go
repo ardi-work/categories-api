@@ -16,6 +16,7 @@ func CategoriesHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
+		name := r.URL.Query().Get("name")
 		page, _ := strconv.Atoi(r.URL.Query().Get("page"))
 		limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
 
@@ -26,7 +27,12 @@ func CategoriesHandler(w http.ResponseWriter, r *http.Request) {
 			limit = 10
 		}
 
-		data := repositories.GetAll()
+		var data []models.Category
+		if name != "" {
+			data = repositories.GetByName(name)
+		} else {
+			data = repositories.GetAll()
+		}
 		result := utils.Paginate(data, page, limit)
 
 		json.NewEncoder(w).Encode(map[string]interface{}{
