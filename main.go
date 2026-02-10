@@ -44,6 +44,8 @@ func main() {
 	http.HandleFunc("/categories/", handlers.CategoryDetailHandler)
 	http.HandleFunc("/products", handlers.ProductsHandler)
 	http.HandleFunc("/products/", handlers.ProductDetailHandler)
+	http.HandleFunc("/transactions", handlers.TransactionsHandler)
+	http.HandleFunc("/transactions/", handlers.TransactionDetailHandler)
 
 	log.Printf("Server running on :%s", config.Port)
 	log.Fatal(http.ListenAndServe(":"+config.Port, nil))

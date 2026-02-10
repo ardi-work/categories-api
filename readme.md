@@ -14,9 +14,13 @@ Project ini cocok sebagai:
 
 - CRUD Kategori (Create, Read, Update, Delete)
 - CRUD Produk (Create, Read, Update, Delete)
+- Transaksi/Checkout untuk kasir
 - Produk dengan relasi ke Kategori (foreign key)
+- Validasi stok sebelum transaksi
+- Auto kurangi stok setelah transaksi berhasil
 - Pagination menggunakan query parameter
 - Filter produk berdasarkan category_id
+- Filter kategori dan produk berdasarkan nama (case-insensitive)
 - Default pagination: **10 data per halaman**
 - Struktur project modular
 - PostgreSQL database integration
@@ -69,6 +73,25 @@ category-api/
 | price       | int   |
 | stock       | int   |
 | categories_id| int   |
+
+### Transaction
+
+| Field       | Type     |
+|------------|----------|
+| id         | int      |
+| total_amount| int     |
+| status     | string   |
+| created_at | time.Time|
+
+### TransactionDetail
+
+| Field        | Type  |
+|-------------|-------|
+| id          | int   |
+| transaction_id| int |
+| product_id  | int   |
+| quantity    | int   |
+| subtotal    | int   |
 
 ---
 
@@ -343,6 +366,135 @@ DELETE /products/{id}
 
 ---
 
+## 💰 Transaction Endpoints
+
+### 1️⃣1️⃣ Create Transaction (Checkout)
+
+```
+POST /transactions
+```
+
+**Request Body:**
+
+```json
+{
+  "items": [
+    {
+      "product_id": 1,
+      "quantity": 2
+    },
+    {
+      "product_id": 3,
+      "quantity": 1
+    }
+  ]
+}
+```
+
+**Response:**
+
+```json
+{
+  "id": 1,
+  "total_amount": 225000,
+  "status": "completed",
+  "details": [
+    {
+      "id": 1,
+      "transaction_id": 1,
+      "product_id": 1,
+      "quantity": 2,
+      "subtotal": 100000
+    },
+    {
+      "id": 2,
+      "transaction_id": 1,
+      "product_id": 3,
+      "quantity": 1,
+      "subtotal": 125000
+    }
+  ]
+}
+```
+
+**Catatan:**
+- Stok produk akan otomatis dikurangi setelah transaksi berhasil
+- Transaksi akan gagal jika stok tidak mencukupi
+
+---
+
+### 1️⃣2️⃣ Get All Transactions (Pagination)
+
+```
+GET /transactions
+```
+
+**Query Params (optional):**
+- `page` → default `1`
+- `limit` → default `10`
+
+**Contoh:**
+```
+GET /transactions?page=1&limit=10
+```
+
+**Response:**
+```json
+{
+  "page": 1,
+  "limit": 10,
+  "data": [
+    {
+      "id": 1,
+      "total_amount": 225000,
+      "status": "completed",
+      "created_at": "2026-02-10T10:00:00Z"
+    }
+  ]
+}
+```
+
+---
+
+### 1️⃣3️⃣ Get Transaction By ID (With Details)
+
+```
+GET /transactions/{id}
+```
+
+**Contoh:**
+```
+GET /transactions/1
+```
+
+**Response:**
+```json
+{
+  "id": 1,
+  "total_amount": 225000,
+  "status": "completed",
+  "created_at": "2026-02-10T10:00:00Z",
+  "details": [
+    {
+      "id": 1,
+      "transaction_id": 1,
+      "product_id": 1,
+      "quantity": 2,
+      "subtotal": 100000
+    },
+    {
+      "id": 2,
+      "transaction_id": 1,
+      "product_id": 3,
+      "quantity": 1,
+      "subtotal": 125000
+    }
+  ]
+}
+```
+
+---
+
 ## 🗄 Database Setup
 
 ### Prerequisites
@@ -352,7 +504,7 @@ DELETE /products/{id}
 
 ### Create Tables
 
-Run these SQL commands to create the categories and products tables:
+Run these SQL commands to create all required tables:
 
 ```sql
 CREATE TABLE categories (
@@ -370,6 +522,21 @@ CREATE TABLE products (
     stock INT NOT NULL,
     categories_id INT NOT NULL,
     FOREIGN KEY (categories_id) REFERENCES categories(id) ON DELETE CASCADE
+);
+
+CREATE TABLE transactions (
+    id SERIAL PRIMARY KEY,
+    total_amount INT NOT NULL,
+    status VARCHAR(20) DEFAULT 'completed',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE transaction_details (
+    id SERIAL PRIMARY KEY,
+    transaction_id INT REFERENCES transactions(id) ON DELETE CASCADE,
+    product_id INT REFERENCES products(id),
+    quantity INT NOT NULL,
+    subtotal INT NOT NULL
 );
 ```
 
