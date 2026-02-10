@@ -42,7 +42,16 @@ func TransactionsHandler(w http.ResponseWriter, r *http.Request) {
 		transaction, err := repositories.CreateTransaction(req.Items)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+			if valErr, ok := err.(*repositories.ValidationError); ok {
+				json.NewEncoder(w).Encode(map[string]interface{}{
+					"error":      valErr.Message,
+					"product_id": valErr.ProductID,
+					"requested":  valErr.Requested,
+					"available":  valErr.Available,
+				})
+			} else {
+				json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+			}
 			return
 		}
 

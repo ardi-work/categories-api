@@ -3,8 +3,22 @@ package repositories
 import (
 	"categories-api/database"
 	"categories-api/models"
-	"errors"
+	"fmt"
 )
+
+type ValidationError struct {
+	Message   string
+	ProductID int
+	Requested int
+	Available int
+}
+
+func (e *ValidationError) Error() string {
+	if e.ProductID > 0 {
+		return fmt.Sprintf("%s (product_id: %d, requested: %d, available: %d)", e.Message, e.ProductID, e.Requested, e.Available)
+	}
+	return e.Message
+}
 
 func CreateTransaction(items []models.TransactionItem) (*models.TransactionWithDetails, error) {
 	db := database.GetDB()
@@ -27,11 +41,19 @@ func CreateTransaction(items []models.TransactionItem) (*models.TransactionWithD
 
 		err := tx.QueryRow("SELECT price, stock FROM products WHERE id = $1 FOR UPDATE", item.ProductID).Scan(&price, &currentStock)
 		if err != nil {
-			return nil, errors.New("product not found")
+			return nil, &ValidationError{
+				Message:   "product not found",
+				ProductID: item.ProductID,
+			}
 		}
 
 		if currentStock < item.Quantity {
-			return nil, errors.New("insufficient stock for product")
+			return nil, &ValidationError{
+				Message:   "insufficient stock for product",
+				ProductID: item.ProductID,
+				Requested: item.Quantity,
+				Available: currentStock,
+			}
 		}
 
 		subtotal := price * item.Quantity

@@ -419,7 +419,28 @@ POST /transactions
 
 **Catatan:**
 - Stok produk akan otomatis dikurangi setelah transaksi berhasil
-- Transaksi akan gagal jika stok tidak mencukupi
+- Transaksi akan gagal jika stok tidak mencukupi atau produk tidak ditemukan
+- Jika terjadi error, response akan berisi detail product_id, requested quantity, dan available stock
+
+**Error Response Examples:**
+
+1. Produk tidak ditemukan:
+```json
+{
+  "error": "product not found",
+  "product_id": 999
+}
+```
+
+2. Stok tidak mencukupi:
+```json
+{
+  "error": "insufficient stock for product",
+  "product_id": 1,
+  "requested": 10,
+  "available": 5
+}
+```
 
 ---
 
