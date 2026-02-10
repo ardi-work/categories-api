@@ -66,7 +66,7 @@ func CreateTransaction(items []models.TransactionItem) (*models.TransactionWithD
 	}
 
 	var transactionID int
-	err = tx.QueryRow("INSERT INTO transactions (total_amount, status) VALUES ($1, 'completed') RETURNING id, total_amount, status, created_at", totalAmount).Scan(&transactionID, &totalAmount, new(string), new(int))
+	err = tx.QueryRow("INSERT INTO transactions (total_amount, status) VALUES ($1, 'completed') RETURNING id", totalAmount).Scan(&transactionID)
 	if err != nil {
 		return nil, err
 	}
@@ -100,13 +100,9 @@ func CreateTransaction(items []models.TransactionItem) (*models.TransactionWithD
 		return nil, err
 	}
 
-	transaction := &models.TransactionWithDetails{
-		Transaction: models.Transaction{
-			ID:          transactionID,
-			TotalAmount: totalAmount,
-			Status:      "completed",
-		},
-		Details: details,
+	transaction, err := GetTransactionByID(transactionID)
+	if err != nil {
+		return nil, err
 	}
 
 	return transaction, nil

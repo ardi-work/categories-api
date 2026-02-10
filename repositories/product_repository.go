@@ -27,7 +27,8 @@ func GetAllProducts() []models.Product {
 
 func GetProductsByName(name string) []models.Product {
 	db := database.GetDB()
-	rows, err := db.Query("SELECT id, name, price, stock, categories_id FROM products WHERE name ILIKE $1 ORDER BY id", "%"+name+"%")
+	searchPattern := "%" + name + "%"
+	rows, err := db.Query("SELECT id, name, price, stock, categories_id FROM products WHERE name ILIKE $1 ORDER BY id", searchPattern)
 	if err != nil {
 		return nil
 	}
