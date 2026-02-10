@@ -10,6 +10,15 @@ import (
 	"github.com/spf13/viper"
 )
 
+//	@title			Categories API
+//	@version		1.0
+//	@description	RESTful API untuk kasir dengan Categories, Products, Transactions, dan Reports
+//	@host			localhost:8080
+//	@BasePath		/
+//	@schemes		http
+//	@produce		json
+//	@consume		json
+
 // ubah Config
 type Config struct {
 	Port   string `mapstructure:"PORT"`
@@ -49,6 +58,17 @@ func main() {
 	http.HandleFunc("/api/report/hari-ini", handlers.TodayReportHandler)
 	http.HandleFunc("/api/report", handlers.DateRangeReportHandler)
 
+	http.HandleFunc("/swagger", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "docs/index.html")
+	})
+	http.HandleFunc("/swagger/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "docs/index.html")
+	})
+	http.HandleFunc("/swagger/doc.json", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "docs/swagger.json")
+	})
+
 	log.Printf("Server running on :%s", config.Port)
+	log.Printf("Swagger UI available at http://localhost:%s/swagger", config.Port)
 	log.Fatal(http.ListenAndServe(":"+config.Port, nil))
 }

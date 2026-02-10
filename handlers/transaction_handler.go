@@ -11,6 +11,16 @@ import (
 	"categories-api/utils"
 )
 
+// @Summary		List all transactions
+// @Description	Get all transactions with pagination
+// @Tags			transactions
+// @Accept			json
+// @Produce		json
+// @Param			page	query		int						false	"Page number"		default(1)
+// @Param			limit	query		int						false	"Items per page"	default(10)
+// @Success		200		{object}	map[string]interface{}	"Success"
+// @Failure		500		{object}	map[string]string		"Internal Server Error"
+// @Router			/transactions [get]
 func TransactionsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -36,6 +46,16 @@ func TransactionsHandler(w http.ResponseWriter, r *http.Request) {
 		})
 
 	case http.MethodPost:
+		//	@Summary		Create transaction (checkout)
+		//	@Description	Create a new transaction with multiple items. Validates stock and auto-decrements product stock.
+		//	@Tags			transactions
+		//	@Accept			json
+		//	@Produce		json
+		//	@Param			request	body		models.TransactionRequest		true	"Transaction request with items"
+		//	@Success		201		{object}	models.TransactionWithDetails	"Transaction created"
+		//	@Failure		400		{object}	map[string]interface{}			"Bad Request - Validation error"
+		//	@Failure		500		{object}	map[string]string				"Internal Server Error"
+		//	@Router			/transactions [post]
 		var req models.TransactionRequest
 		json.NewDecoder(r.Body).Decode(&req)
 
@@ -63,6 +83,15 @@ func TransactionsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// @Summary		Get transaction by ID
+// @Description	Get a single transaction with all details by transaction ID
+// @Tags			transactions
+// @Accept			json
+// @Produce		json
+// @Param			id	path		int								true	"Transaction ID"
+// @Success		200	{object}	models.TransactionWithDetails	"Success"
+// @Failure		404	{object}	map[string]string				"Not Found"
+// @Router			/transactions/{id} [get]
 func TransactionDetailHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	idStr := strings.TrimPrefix(r.URL.Path, "/transactions/")

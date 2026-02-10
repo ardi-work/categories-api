@@ -7,6 +7,14 @@ import (
 	"categories-api/repositories"
 )
 
+// @Summary		Get today's report
+// @Description	Get sales report for today including total revenue, total transactions, and best selling products
+// @Tags			reports
+// @Accept			json
+// @Produce		json
+// @Success		200	{object}	models.DailyReport	"Success"
+// @Failure		500	{object}	map[string]string	"Internal Server Error"
+// @Router			/api/report/hari-ini [get]
 func TodayReportHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -25,6 +33,17 @@ func TodayReportHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(report)
 }
 
+// @Summary		Get date range report
+// @Description	Get sales report for a specific date range including total revenue, total transactions, and best selling products
+// @Tags			reports
+// @Accept			json
+// @Produce		json
+// @Param			start_date	query		string					true	"Start date (YYYY-MM-DD)"
+// @Param			end_date	query		string					true	"End date (YYYY-MM-DD)"
+// @Success		200			{object}	models.DateRangeReport	"Success"
+// @Failure		400			{object}	map[string]string		"Bad Request - Invalid date format"
+// @Failure		500			{object}	map[string]string		"Internal Server Error"
+// @Router			/api/report [get]
 func DateRangeReportHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 

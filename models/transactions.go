@@ -3,27 +3,27 @@ package models
 import "time"
 
 type Transaction struct {
-	ID          int       `json:"id"`
-	TotalAmount int       `json:"total_amount"`
-	Status      string    `json:"status"`
-	CreatedAt   time.Time `json:"created_at"`
+	ID          int       `json:"id" example:"1"`
+	TotalAmount int       `json:"total_amount" example:"35000"`
+	Status      string    `json:"status" example:"completed"`
+	CreatedAt   time.Time `json:"created_at" example:"2026-02-10T10:00:00Z"`
 }
 
 type TransactionDetail struct {
-	ID            int `json:"id"`
-	TransactionID int `json:"transaction_id"`
-	ProductID     int `json:"product_id"`
-	Quantity      int `json:"quantity"`
-	Subtotal      int `json:"subtotal"`
+	ID            int `json:"id" example:"1"`
+	TransactionID int `json:"transaction_id" example:"1"`
+	ProductID     int `json:"product_id" example:"1"`
+	Quantity      int `json:"quantity" example:"2"`
+	Subtotal      int `json:"subtotal" example:"7000"`
 }
 
 type TransactionItem struct {
-	ProductID int `json:"product_id"`
-	Quantity  int `json:"quantity"`
+	ProductID int `json:"product_id" example:"1"`
+	Quantity  int `json:"quantity" example:"2"`
 }
 
 type TransactionRequest struct {
-	Items []TransactionItem `json:"items"`
+	Items []TransactionItem `json:"items" example:"[{\"product_id\":1,\"quantity\":2}]"`
 }
 
 type TransactionWithDetails struct {
