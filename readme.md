@@ -15,6 +15,8 @@ Project ini cocok sebagai:
 - CRUD Kategori (Create, Read, Update, Delete)
 - CRUD Produk (Create, Read, Update, Delete)
 - Transaksi/Checkout untuk kasir
+- Report transaksi (hari ini dan date range)
+- Produk terlaris per periode
 - Produk dengan relasi ke Kategori (foreign key)
 - Validasi stok sebelum transaksi
 - Auto kurangi stok setelah transaksi berhasil
@@ -40,13 +42,19 @@ category-api/
 │   └── database.go       # PostgreSQL connection
 ├── models/
 │   ├── categories.go     # Category data model
-│   └── products.go       # Product data model
+│   ├── products.go       # Product data model
+│   ├── transactions.go   # Transaction data model
+│   └── report.go         # Report data model
 ├── repositories/
 │   ├── category_repository.go # Category database operations
-│   └── product_repository.go   # Product database operations
+│   ├── product_repository.go   # Product database operations
+│   ├── transaction_repository.go # Transaction database operations
+│   └── report_repository.go     # Report database operations
 ├── handlers/
 │   ├── category_handler.go    # Category HTTP handlers
-│   └── product_handler.go     # Product HTTP handlers
+│   ├── product_handler.go     # Product HTTP handlers
+│   ├── transaction_handler.go  # Transaction HTTP handlers
+│   └── report_handler.go      # Report HTTP handlers
 ├── utils/
 │   └── pagination.go     # Pagination utility
 
@@ -92,6 +100,21 @@ category-api/
 | product_id  | int   |
 | quantity    | int   |
 | subtotal    | int   |
+
+### BestSellingProduct
+
+| Field     | Type  |
+|----------|-------|
+| nama     | string|
+| qty_terjual| int  |
+
+### DailyReport
+
+| Field       | Type  |
+|------------|-------|
+| total_revenue| int  |
+| total_transaksi| int |
+| produk_terlaris| []BestSellingProduct|
 
 ---
 

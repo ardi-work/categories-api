@@ -46,6 +46,8 @@ func main() {
 	http.HandleFunc("/products/", handlers.ProductDetailHandler)
 	http.HandleFunc("/transactions", handlers.TransactionsHandler)
 	http.HandleFunc("/transactions/", handlers.TransactionDetailHandler)
+	http.HandleFunc("/api/report/hari-ini", handlers.TodayReportHandler)
+	http.HandleFunc("/api/report", handlers.DateRangeReportHandler)
 
 	log.Printf("Server running on :%s", config.Port)
 	log.Fatal(http.ListenAndServe(":"+config.Port, nil))
